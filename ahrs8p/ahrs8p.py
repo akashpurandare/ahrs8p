@@ -6,7 +6,7 @@ class Imu:
         self._port=None
 
     def connect(self):
-        self._port=serial.Serial("/dev/tty.usbserial-A5055UXR", baudrate=115200)
+        self._port=serial.Serial(self._port_name, baudrate=115200)
         return self._port.is_open
 
     def read(self):

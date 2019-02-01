@@ -1,4 +1,4 @@
 __version__ = "0.0.1"
 
 
-from .ahrs8p import classname
+from .ahrs8p import Imu
