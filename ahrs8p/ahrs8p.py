@@ -2,6 +2,15 @@ import serial
 import asvprotobuf
 import math
 import numpy as np
+from serial.tools.list_ports import comports
+
+def get_ahrs():
+    VID = 1027
+    PID = 24577
+    for port in comports():
+        if port.vid == VID and port.pid == PID:
+            return port.device
+    return ''
 
 def parse(data):
     mystring = [i.split() for i in data.data.split("\n")]
@@ -53,3 +62,6 @@ class Imu:
             if(line.startswith("OK")):
                 return "\n".join(result)
             result.append(line)
+
+    def disconnect(self):
+        self._port.close()
