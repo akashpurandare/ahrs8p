@@ -22,8 +22,7 @@ try:
         msg.header.frame_id = "imu"
         msg.data = ahrs.read()
         pub.publish(msg)
-        if(1/READ_FREQUENCY-time.time()+t>0):
-            time.sleep(1/READ_FREQUENCY-time.time()+t)
+
 except KeyboardInterrupt:
     ahrs.disconnect()
     asvmq.log_debug("Closing AHRS Port at %s" % datetime.datetime.now().strftime("%c"))

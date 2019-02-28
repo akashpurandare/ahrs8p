@@ -13,8 +13,6 @@ try:
         t = time.time()
         msg = ahrs8p.parse(data)
         pub.publish(msg)
-        if(1/READ_FREQUENCY-time.time()+t>0):
-            time.sleep(1/READ_FREQUENCY-time.time()+t)
 
     asvmq.Subscriber(topic_name="imu_raw", object_type=asvprotobuf.sensor_pb2.Serial, callback=callback)
 
