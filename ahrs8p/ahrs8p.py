@@ -14,15 +14,15 @@ def get_ahrs():
     return ''
 
 def parse(data):
-    print(datetime.datetime.fromtimestamp(data.header.stamp.seconds+data.header.stamp.nanos*10**(-9)))
+    #print(datetime.datetime.fromtimestamp(data.header.stamp.seconds+data.header.stamp.nanos*10**(-9)))
     mystring = [i.split() for i in data.data.split("\n")]
     msg = asvprotobuf.sensor_pb2.Imu()
     msg.header.stamp.seconds = data.header.stamp.seconds
     msg.header.stamp.nanos = data.header.stamp.nanos
     msg.header.frame_id = data.header.frame_id
-    msg.orientation.roll = float(mystring[1][2])
-    msg.orientation.pitch = float(mystring[2][2])
-    msg.orientation.yaw = float(mystring[3][2])
+    msg.orientation.roll = math.radians(float(mystring[1][2]))
+    msg.orientation.pitch = math.radians(float(mystring[2][2]))
+    msg.orientation.yaw = math.radians(float(mystring[3][2]))
     msg.acceleration.x = float(mystring[4][3])
     msg.acceleration.y = float(mystring[5][1])
     msg.acceleration.z = float(mystring[6][1])
@@ -39,9 +39,9 @@ def parse(data):
         expected_x *= -1
     if(np.sign(expected_y)!=np.sign(msg.acceleration.y)):
         expected_y *= -1
-    msg.acceleration.z = float("%f" % (msg.acceleration.z-expected_z))
-    msg.acceleration.x = float("%f" % (msg.acceleration.x-expected_x))
-    msg.acceleration.y = float("%f" % (msg.acceleration.y-expected_y))
+    msg.acceleration.z = float("%f" % (msg.acceleration.z-expected_z))/100
+    msg.acceleration.x = float("%f" % (msg.acceleration.x-expected_x))/100
+    msg.acceleration.y = float("%f" % (msg.acceleration.y-expected_y))/100
     msg.temperature = float(mystring[-1][2])
     return msg
 
