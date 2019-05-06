@@ -55,7 +55,7 @@ class Imu:
         self._port=None
 
     def connect(self):
-        self._port=serial.Serial(self._port_name, baudrate=115200)
+        self._port=serial.Serial(self._port_name, baudrate=115200, timeout=4)
         return self._port.is_open
 
     def read(self):
@@ -64,7 +64,10 @@ class Imu:
         self._port.write("roll di. pitch di. yaw di. accelp di. gyrop di. temperature di.\r\n".encode())
         result = []
         while(True):
-            line=self._port.readline().decode().strip()
+            line=self._port.readline().decode()
+            if not line.endswith("\r\n"):
+                asvmq.log_fatal("IMU Could not be read. Reconnecting to module now...")
+            line = line.strip()
             if(line.startswith("OK")):
                 return "\n".join(result)
             if(len(line)!=0):

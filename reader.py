@@ -4,6 +4,8 @@ import asvprotobuf
 import time
 import datetime
 
+#TODO: Add a fail safe to detect when IMU is disconnected and try to reconnect to it
+
 try:
     READ_FREQUENCY = 20
 
