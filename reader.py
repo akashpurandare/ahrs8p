@@ -15,10 +15,8 @@ try:
     ahrs = ahrs8p.Imu(port_name)
     ahrs.connect()
     while True:
-        t = time.time()
         msg = asvprotobuf.sensor_pb2.Serial()
-        msg.header.stamp.seconds = int(t)
-        msg.header.stamp.nanos = int((t-int(t))*10**9)
+        msg.header.stamp = time.time()
         msg.header.frame_id = "imu"
         msg.data = ahrs.read()
         pub.publish(msg)

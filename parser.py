@@ -18,4 +18,3 @@ try:
 
 except KeyboardInterrupt:
     asvmq.log_debug("Closing AHRS Parser at %s" % datetime.datetime.now().strftime("%c"))
-    print("\nClosing AHRS Parser at %s" % datetime.datetime.now().strftime("%c"))
