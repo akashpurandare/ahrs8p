@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-from setuptools import setup, find_packages
+try:
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
@@ -10,6 +10,8 @@ readme = open("README.md", "r").read()
 
 import ahrs8p
 version = ahrs8p.__version__
+
+requirements = open("requirements.txt", "r").read().split("\n")
 
 setup(
     name="ahs8p",
@@ -22,7 +24,7 @@ setup(
     url="https://github.com/akashp1997/ahrs8p",
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[],
+    install_requires=requirements,
     license="BSD-3-Clause",
     zip_safe=True,
     keywords=["ahrs8p","spartan"],

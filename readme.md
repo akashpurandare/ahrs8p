@@ -6,6 +6,6 @@ This repository contains the SRMASV AHRS8 library.
 `python setup.py install`
 -
 The following module contains the following:
--
-- Temp
-- Quarternion
+
+- IMU class for library to interface AHRS-8P
+- Serial Auto Detection to detect IMU's serial port on OS

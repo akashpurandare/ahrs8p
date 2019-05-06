@@ -15,6 +15,7 @@ try:
         pub.publish(msg)
 
     asvmq.Subscriber(topic_name="imu_raw", object_type=asvprotobuf.sensor_pb2.Serial, callback=callback)
+    asvmq.spin()
 
 except KeyboardInterrupt:
     asvmq.log_debug("Closing AHRS Parser at %s" % datetime.datetime.now().strftime("%c"))
