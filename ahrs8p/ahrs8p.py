@@ -6,10 +6,8 @@ Variables that store sensory data.
 This package also uses Pyserial's autodetect libraries to
 automatically detect Serial libraries.
 '''
-import math
 import serial
 from serial.tools.list_ports import comports
-
 import asvprotobuf.sensor_pb2
 import numpy as np
 
@@ -27,32 +25,37 @@ def get_ahrs():
 
 def parse(data):
     '''This function converts a single IMU output to an ASVProtobuf message'''
+    #GPS is North-East-Up while IMU is North-West-Up
     mystring = [i.split() for i in data.data.split("\n")]
     msg = asvprotobuf.sensor_pb2.Imu()
     msg.header.stamp = data.header.stamp
     msg.header.frame_id = data.header.frame_id
-    msg.orientation.roll = math.radians(float(mystring[1][2]))
-    msg.orientation.pitch = math.radians(float(mystring[2][2]))
-    msg.orientation.yaw = math.radians(float(mystring[3][2]))
-    msg.acceleration.x = float(mystring[4][3])/100
-    msg.acceleration.y = float(mystring[5][1])/100
-    msg.acceleration.z = float(mystring[6][1])/100
+    msg.orientation.roll = np.radians(float(mystring[1][2]))
+    msg.orientation.pitch = np.radians(float(mystring[2][2]))
+    msg.orientation.yaw = np.radians(float(mystring[3][2]))
     msg.angular_velocity.roll = float(mystring[7][3])
     msg.angular_velocity.pitch = float(mystring[8][1])
     msg.angular_velocity.yaw = float(mystring[9][1])
+    #Transform acceleration to world frame
+    ax = float(mystring[4][3])/100
+    ay = float(mystring[5][1])/100
+    az = float(mystring[6][1])/100
     z_error = [msg.orientation.yaw, msg.orientation.pitch, msg.orientation.roll]
-    expected_z = GRAVITY*math.cos(z_error[1])*math.cos(z_error[2])
-    expected_x = GRAVITY*math.sin(z_error[1])
-    expected_y = GRAVITY*math.sin(z_error[2])
-    if np.sign(expected_z) != np.sign(msg.acceleration.z):
+    expected_z = GRAVITY*np.cos(z_error[1])*np.cos(z_error[2])
+    expected_x = GRAVITY*np.sin(z_error[1])
+    expected_y = GRAVITY*np.sin(z_error[2])
+    if np.sign(expected_z) != np.sign(az):
         expected_z *= -1
-    if np.sign(expected_x) != np.sign(msg.acceleration.x):
+    if np.sign(expected_x) != np.sign(ax):
         expected_x *= -1
-    if np.sign(expected_y) != np.sign(msg.acceleration.y):
+    if np.sign(expected_y) != np.sign(ay):
         expected_y *= -1
-    msg.acceleration.z = float("%f" % (0.98*msg.acceleration.z-expected_z))
-    msg.acceleration.x = float("%f" % (0.98*msg.acceleration.x-expected_x))
-    msg.acceleration.y = float("%f" % (0.98*msg.acceleration.y-expected_y))
+    msg.acceleration.z = round(0.98*az-expected_z, 6)
+    ax = round(0.98*ax-expected_x, 6)
+    ay = round(0.98*ay-expected_y, 6)
+    msg.acceleration.y = ax*np.cos(z_error[0])+ay*np.sin(z_error[0])
+    msg.acceleration.x =ax*np.sin(z_error[0])+ay*np.cos(z_error[0])
+    #print("%.2f" % (abs(ax)-abs(msg.acceleration.x)))
     msg.temperature = float(mystring[-1][2])
     return msg
 
